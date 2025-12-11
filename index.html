@@ -1,0 +1,1941 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>服务打卡查询管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1a73e8 0%, #6c8ef5 100%);
+            color: white;
+            padding: 25px 30px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        
+        .main-content {
+            display: flex;
+            min-height: 600px;
+        }
+        
+        .sidebar {
+            width: 320px;
+            background-color: #f9fafc;
+            border-right: 1px solid #eaeaea;
+            padding: 25px;
+        }
+        
+        .content {
+            flex: 1;
+            padding: 25px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            color: #1a73e8;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eaeaea;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #555;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 15px;
+            transition: border 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: #1a73e8;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        }
+        
+        .input-with-button {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .input-with-button .form-control {
+            flex: 1;
+        }
+        
+        .btn-input {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 0 15px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-input:hover {
+            background-color: #0d62d9;
+        }
+        
+        .date-range {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .date-range span {
+            color: #777;
+            text-align: center;
+            margin: 5px 0;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #1a73e8;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0d62d9;
+        }
+        
+        .btn-secondary {
+            background-color: #f1f3f4;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e3e6e8;
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        .btn-photo {
+            background-color: #34a853;
+            color: white;
+        }
+        
+        .btn-photo:hover {
+            background-color: #2e8b47;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        .records-summary {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .summary-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            flex: 1;
+            min-width: 200px;
+            border-left: 4px solid #1a73e8;
+        }
+        
+        .summary-card.warning {
+            border-left-color: #fbbc04;
+        }
+        
+        .summary-card.danger {
+            border-left-color: #ea4335;
+        }
+        
+        .summary-card.location {
+            border-left-color: #9c27b0;
+        }
+        
+        .summary-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .summary-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a73e8;
+        }
+        
+        .summary-card.warning .summary-value {
+            color: #fbbc04;
+        }
+        
+        .summary-card.danger .summary-value {
+            color: #ea4335;
+        }
+        
+        .summary-card.location .summary-value {
+            color: #9c27b0;
+        }
+        
+        .records-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        .records-table th {
+            background-color: #f1f3f4;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        .records-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .records-table tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .records-table tr.abnormal {
+            background-color: #fff8e1;
+        }
+        
+        .records-table tr.abnormal:hover {
+            background-color: #fff5d6;
+        }
+        
+        .records-table tr.location-abnormal {
+            background-color: #f3e5f5;
+        }
+        
+        .records-table tr.location-abnormal:hover {
+            background-color: #e8daef;
+        }
+        
+        .records-table tr.both-abnormal {
+            background-color: #ffebee;
+        }
+        
+        .records-table tr.both-abnormal:hover {
+            background-color: #ffcdd2;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .status-completed {
+            background-color: #e6f4ea;
+            color: #137333;
+        }
+        
+        .status-in-progress {
+            background-color: #fef7e0;
+            color: #b06000;
+        }
+        
+        .status-cancelled {
+            background-color: #fce8e6;
+            color: #c5221f;
+        }
+        
+        .duration-cell {
+            font-weight: 600;
+        }
+        
+        .duration-short {
+            color: #34a853;
+        }
+        
+        .duration-normal {
+            color: #1a73e8;
+        }
+        
+        .duration-long {
+            color: #ea4335;
+        }
+        
+        .location-status {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .location-ok {
+            background-color: #e6f4ea;
+            color: #137333;
+        }
+        
+        .location-error {
+            background-color: #fce8e6;
+            color: #c5221f;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: nowrap;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        
+        .btn-view {
+            background-color: #1a73e8;
+            color: white;
+        }
+        
+        .btn-view:hover {
+            background-color: #0d62d9;
+        }
+        
+        /* 异常原点标识样式 */
+        .abnormal-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+        
+        .duration-abnormal-dot {
+            background-color: #fbbc04; /* 黄色 - 时长异常 */
+        }
+        
+        .location-abnormal-dot {
+            background-color: #9c27b0; /* 紫色 - 定位异常 */
+        }
+        
+        .record-id-container {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .detail-modal, .fullscreen-photo-modal, .tree-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .fullscreen-photo-modal {
+            background-color: rgba(0, 0, 0, 0.95);
+        }
+        
+        .modal-content {
+            background-color: white;
+            width: 90%;
+            max-width: 1000px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .tree-modal .modal-content {
+            max-width: 600px;
+            max-height: 80vh;
+        }
+        
+        .modal-header {
+            background-color: #1a73e8;
+            color: white;
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            font-size: 22px;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+        
+        .close-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .modal-body {
+            padding: 25px;
+        }
+        
+        /* 树形结构样式 */
+        .tree-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        
+        .tree-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .tree-list ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+        
+        .tree-item {
+            padding: 8px 10px;
+            margin: 2px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .tree-item:hover {
+            background-color: #f0f7ff;
+        }
+        
+        .tree-item.selected {
+            background-color: #e3f2fd;
+            font-weight: 600;
+            color: #1a73e8;
+        }
+        
+        .tree-item .toggle {
+            display: inline-block;
+            width: 20px;
+            text-align: center;
+            margin-right: 5px;
+            font-weight: bold;
+        }
+        
+        .tree-item .icon {
+            display: inline-block;
+            width: 20px;
+            text-align: center;
+            margin-right: 5px;
+        }
+        
+        .tree-search {
+            margin-bottom: 15px;
+        }
+        
+        .tree-search input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .detail-section {
+            margin-bottom: 25px;
+        }
+        
+        .detail-section h3 {
+            font-size: 18px;
+            color: #1a73e8;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .detail-item {
+            margin-bottom: 10px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            font-size: 16px;
+        }
+        
+        .abnormal-tag {
+            display: inline-block;
+            background-color: #fce8e6;
+            color: #c5221f;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        .location-abnormal-tag {
+            display: inline-block;
+            background-color: #f3e5f5;
+            color: #9c27b0;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        /* 详情中的照片预览部分 */
+        .photos-preview-section {
+            margin-top: 10px;
+        }
+        
+        .photos-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .photo-preview-item {
+            width: 120px;
+            height: 120px;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .photo-preview-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .photo-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .photo-count {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            text-align: center;
+            padding: 4px;
+            font-size: 12px;
+        }
+        
+        /* 全屏照片查看样式 */
+        .fullscreen-photo-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .fullscreen-photo {
+            max-width: 95%;
+            max-height: 95%;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .fullscreen-close-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            font-size: 30px;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            z-index: 1001;
+        }
+        
+        .fullscreen-close-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+        
+        .photo-info-overlay {
+            position: fixed;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .location-map {
+            height: 200px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .location-map::before {
+            content: "📍";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30px;
+            z-index: 2;
+        }
+        
+        .location-map.target::before {
+            content: "🎯";
+            color: #34a853;
+        }
+        
+        .location-map.actual::before {
+            content: "📍";
+            color: #ea4335;
+        }
+        
+        .location-distance {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: 600;
+            z-index: 3;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 40px 20px;
+            color: #777;
+        }
+        
+        .no-data i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+        
+        @media (max-width: 1200px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #eaeaea;
+            }
+            
+            .records-summary {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .records-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .date-range {
+                flex-direction: column;
+            }
+            
+            .input-with-button {
+                flex-direction: column;
+            }
+            
+            .input-with-button .btn-input {
+                width: 100%;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>智慧宝服务打卡查询</h1>
+            <p>查询和管理所有服务打卡记录，电脑端BOSS或报表</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="sidebar">
+                <h2 class="section-title">查询条件</h2>
+                
+                <div class="form-group">
+                    <label for="gridArea">地址</label>
+                    <div class="input-with-button">
+                        <input type="text" id="gridArea" class="form-control" placeholder="点击选择地址" readonly>
+                        <button class="btn-input" onclick="showTreeModal('grid')">选择</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="department">操作员部门</label>
+                    <div class="input-with-button">
+                        <input type="text" id="department" class="form-control" placeholder="点击选择部门" readonly>
+                        <button class="btn-input" onclick="showTreeModal('department')">选择</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="operator">操作员</label>
+                    <div class="input-with-button">
+                        <input type="text" id="operator" class="form-control" placeholder="点击选择操作员" readonly>
+                        <button class="btn-input" onclick="showTreeModal('operator')">选择</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="serviceType">服务类型</label>
+                    <select id="serviceType" class="form-control">
+                        <option value="">全部服务类型</option>
+                        <option value="installation">设备安装</option>
+                        <option value="maintenance">设备维护</option>
+                        <option value="repair">故障维修</option>
+                        <option value="inspection">定期检查</option>
+                        <option value="training">使用培训</option>
+                        <option value="consultation">技术咨询</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dateRange">服务时间段</label>
+                    <div class="date-range">
+                        <input type="date" id="startDate" class="form-control" value="2025-12-01">
+                        <span>至</span>
+                        <input type="date" id="endDate" class="form-control" value="2025-12-18">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="abnormalFilter">异常筛选</label>
+                    <select id="abnormalFilter" class="form-control">
+                        <option value="all">全部记录</option>
+                        <option value="duration">仅显示时长异常</option>
+                        <option value="location">仅显示定位异常</option>
+                        <option value="both">仅显示双重异常</option>
+                    </select>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary btn-block" onclick="searchRecords()">查询记录</button>
+                    <button class="btn btn-secondary btn-block" onclick="resetForm()">重置条件</button>
+                </div>
+            </div>
+            
+            <div class="content">
+                <h2 class="section-title">查询结果</h2>
+                
+                <div class="records-summary" id="recordsSummary">
+                    <!-- 统计信息将在这里动态生成 -->
+                </div>
+                
+                <div class="table-container">
+                    <table class="records-table" id="recordsTable">
+                        <thead>
+                            <tr>
+                                <th>记录ID</th>
+                                <th>客户姓名</th>
+                                <th>操作员</th>
+                                <th>服务类型</th>
+                                <th>服务时长</th>
+                                <th>定位状态</th>
+                                <th>开始时间</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recordsBody">
+                            <!-- 记录将在这里动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="no-data" id="noDataMessage">
+                    <div>📊</div>
+                    <h3>暂无打卡记录</h3>
+                    <p>请设置查询条件并点击"查询记录"按钮查看结果</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 详情模态框 -->
+    <div class="detail-modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>打卡记录详情</h2>
+                <button class="close-btn" onclick="closeModal('detailModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- 详情内容将在这里动态生成 -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- 全屏照片查看模态框 -->
+    <div class="fullscreen-photo-modal" id="fullscreenPhotoModal">
+        <button class="fullscreen-close-btn" onclick="closeFullscreenPhoto()">&times;</button>
+        <div class="fullscreen-photo-container" id="fullscreenPhotoContainer">
+            <!-- 全屏照片将在这里显示 -->
+        </div>
+        <div class="photo-info-overlay" id="photoInfoOverlay">
+            <!-- 照片信息将在这里显示 -->
+        </div>
+    </div>
+    
+    <!-- 树形选择模态框 -->
+    <div class="tree-modal" id="treeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="treeModalTitle">选择</h2>
+                <button class="close-btn" onclick="closeModal('treeModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="tree-search">
+                    <input type="text" id="treeSearch" placeholder="搜索..." onkeyup="filterTree()">
+                </div>
+                <div class="tree-container">
+                    <ul class="tree-list" id="treeList">
+                        <!-- 树形结构将在这里动态生成 -->
+                    </ul>
+                </div>
+                <div style="margin-top: 20px; text-align: right;">
+                    <button class="btn btn-secondary" onclick="closeModal('treeModal')">取消</button>
+                    <button class="btn btn-primary" onclick="confirmTreeSelection()" style="margin-left: 10px;">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟数据 - 增加定位异常信息
+        const mockRecords = [
+            {
+                id: "REC001",
+                customerName: "李四",
+                customerCode: "211000150123",
+                phone: "13800138000",
+                address: "天津市南开区某某小区12号楼3单元501",
+                targetLocation: "116.404, 39.915", // 目标位置
+                actualLocation: "116.404, 39.915", // 实际位置
+                distance: 0, // 距离差（米）
+                grid: "网格一（南开区）",
+                operator: "张三",
+                operatorId: "520111xlx",
+                department: "和平河西分公司",
+                serviceType: "设备安装",
+                startTime: "2023-10-15 09:30:25",
+                endTime: "2023-10-15 11:15:10",
+                duration: 104, // 分钟
+                durationText: "1小时44分钟",
+                photos: 3,
+                locationStatus: "正常",
+                status: "completed",
+                balance: "¥120.00",
+                socialCategory: "普通客户",
+                abnormal: false,
+                locationAbnormal: false,
+                abnormalReason: "",
+                locationAbnormalReason: ""
+            },
+            {
+                id: "REC002",
+                customerName: "王明",
+                customerCode: "211000150124",
+                phone: "13900139000",
+                address: "天津市河西区某某花园8号楼2单元302",
+                targetLocation: "117.204, 39.125",
+                actualLocation: "117.215, 39.135",
+                distance: 1200, // 1.2公里
+                grid: "网格二（河西区）",
+                operator: "李四",
+                operatorId: "520112wl",
+                department: "城西分公司",
+                serviceType: "故障维修",
+                startTime: "2023-10-16 14:20:15",
+                endTime: "2023-10-16 16:05:30",
+                duration: 105, // 分钟
+                durationText: "1小时45分钟",
+                photos: 2,
+                locationStatus: "偏差",
+                status: "completed",
+                balance: "¥85.50",
+                socialCategory: "VIP客户",
+                abnormal: true,
+                locationAbnormal: true,
+                abnormalReason: "服务时长异常",
+                locationAbnormalReason: "定位偏差1.2公里"
+            },
+            {
+                id: "REC003",
+                customerName: "张红",
+                customerCode: "211000150125",
+                phone: "13600136000",
+                address: "天津市和平区某某大厦15楼1503室",
+                targetLocation: "117.204, 39.115",
+                actualLocation: "117.204, 39.115",
+                distance: 0,
+                grid: "网格三（和平区）",
+                operator: "王五",
+                operatorId: "520113zm",
+                department: "滨海分公司",
+                serviceType: "使用培训",
+                startTime: "2023-10-17 10:10:00",
+                endTime: "2023-10-17 11:30:00",
+                duration: 80, // 分钟
+                durationText: "1小时20分钟",
+                photos: 4,
+                locationStatus: "正常",
+                status: "completed",
+                balance: "¥200.00",
+                socialCategory: "企业客户",
+                abnormal: false,
+                locationAbnormal: false,
+                abnormalReason: "",
+                locationAbnormalReason: ""
+            },
+            {
+                id: "REC004",
+                customerName: "赵刚",
+                customerCode: "211000150126",
+                phone: "13700137000",
+                address: "天津市河东区某某小区5号楼1单元101",
+                targetLocation: "117.254, 39.135",
+                actualLocation: "117.280, 39.150",
+                distance: 2800, // 2.8公里
+                grid: "网格四（河东区）",
+                operator: "赵六",
+                operatorId: "520114lp",
+                department: "宁河分公司",
+                serviceType: "设备安装",
+                startTime: "2023-10-18 13:45:20",
+                endTime: "2023-10-18 16:20:10",
+                duration: 155, // 分钟
+                durationText: "2小时35分钟",
+                photos: 5,
+                locationStatus: "偏差",
+                status: "completed",
+                balance: "¥320.00",
+                socialCategory: "普通客户",
+                abnormal: true,
+                locationAbnormal: true,
+                abnormalReason: "服务时长超过标准",
+                locationAbnormalReason: "定位偏差2.8公里"
+            },
+            {
+                id: "REC005",
+                customerName: "刘芳",
+                customerCode: "211000150127",
+                phone: "13500135000",
+                address: "天津市河北区某某家园3号楼4单元202",
+                targetLocation: "117.204, 39.155",
+                actualLocation: "117.204, 39.155",
+                distance: 0,
+                grid: "网格五（河北区）",
+                operator: "张三",
+                operatorId: "520111xlx",
+                department: "和平河西分公司",
+                serviceType: "设备维护",
+                startTime: "2023-10-19 09:15:00",
+                endTime: "2023-10-19 10:45:00",
+                duration: 90, // 分钟
+                durationText: "1小时30分钟",
+                photos: 2,
+                locationStatus: "正常",
+                status: "completed",
+                balance: "¥150.00",
+                socialCategory: "老年客户",
+                abnormal: false,
+                locationAbnormal: false,
+                abnormalReason: "",
+                locationAbnormalReason: ""
+            },
+            {
+                id: "REC006",
+                customerName: "陈伟",
+                customerCode: "211000150128",
+                phone: "13400134000",
+                address: "天津市南开区某某小区10号楼2单元601",
+                targetLocation: "116.404, 39.915",
+                actualLocation: "116.410, 39.920",
+                distance: 800, // 0.8公里
+                grid: "网格一（南开区）",
+                operator: "李四",
+                operatorId: "520112wl",
+                department: "城西分公司",
+                serviceType: "定期检查",
+                startTime: "2023-10-20 14:30:00",
+                endTime: "2023-10-20 15:45:00",
+                duration: 75, // 分钟
+                durationText: "1小时15分钟",
+                photos: 3,
+                locationStatus: "偏差",
+                status: "in-progress",
+                balance: "¥90.00",
+                socialCategory: "普通客户",
+                abnormal: true,
+                locationAbnormal: false,
+                abnormalReason: "服务未完成",
+                locationAbnormalReason: ""
+            },
+            {
+                id: "REC007",
+                customerName: "杨洋",
+                customerCode: "211000150129",
+                phone: "13300133000",
+                address: "天津市河西区某某国际大厦22楼2208",
+                targetLocation: "117.204, 39.125",
+                actualLocation: "117.300, 39.200",
+                distance: 12500, // 12.5公里
+                grid: "网格二（河西区）",
+                operator: "王五",
+                operatorId: "520113zm",
+                department: "滨海分公司",
+                serviceType: "技术咨询",
+                startTime: "2023-10-21 11:00:00",
+                endTime: "2023-10-21 12:20:00",
+                duration: 80, // 分钟
+                durationText: "1小时20分钟",
+                photos: 1,
+                locationStatus: "偏差",
+                status: "cancelled",
+                balance: "¥0.00",
+                socialCategory: "企业客户",
+                abnormal: false,
+                locationAbnormal: true,
+                abnormalReason: "",
+                locationAbnormalReason: "定位偏差12.5公里，可能未到达现场"
+            },
+            {
+                id: "REC008",
+                customerName: "周涛",
+                customerCode: "211000150130",
+                phone: "13200132000",
+                address: "天津市和平区某某公寓B座903",
+                targetLocation: "117.204, 39.115",
+                actualLocation: "117.204, 39.115",
+                distance: 0,
+                grid: "网格三（和平区）",
+                operator: "赵六",
+                operatorId: "520114lp",
+                department: "宁河分公司",
+                serviceType: "设备安装",
+                startTime: "2023-10-22 09:45:00",
+                endTime: "2023-10-22 12:30:00",
+                duration: 165, // 分钟
+                durationText: "2小时45分钟",
+                photos: 6,
+                locationStatus: "正常",
+                status: "completed",
+                balance: "¥280.00",
+                socialCategory: "VIP客户",
+                abnormal: true,
+                locationAbnormal: false,
+                abnormalReason: "服务时长异常，照片数量异常",
+                locationAbnormalReason: ""
+            },
+            {
+                id: "REC009",
+                customerName: "吴华",
+                customerCode: "211000150131",
+                phone: "13100131000",
+                address: "天津市河东区某某小区7号楼3单元402",
+                targetLocation: "117.254, 39.135",
+                actualLocation: "117.260, 39.140",
+                distance: 700, // 0.7公里
+                grid: "网格四（河东区）",
+                operator: "张三",
+                operatorId: "520111xlx",
+                department: "和平河西分公司",
+                serviceType: "设备维护",
+                startTime: "2023-10-23 13:00:00",
+                endTime: "2023-10-23 13:25:00",
+                duration: 25, // 分钟
+                durationText: "25分钟",
+                photos: 0,
+                locationStatus: "偏差",
+                status: "completed",
+                balance: "¥75.00",
+                socialCategory: "普通客户",
+                abnormal: true,
+                locationAbnormal: false,
+                abnormalReason: "服务时长过短",
+                locationAbnormalReason: ""
+            },
+            {
+                id: "REC010",
+                customerName: "郑丽",
+                customerCode: "211000150132",
+                phone: "13000130000",
+                address: "天津市河北区某某花园12号楼1单元301",
+                targetLocation: "117.204, 39.155",
+                actualLocation: "117.250, 39.180",
+                distance: 5600, // 5.6公里
+                grid: "网格五（河北区）",
+                operator: "李四",
+                operatorId: "520112wl",
+                department: "城西分公司",
+                serviceType: "故障维修",
+                startTime: "2023-10-24 15:30:00",
+                endTime: "2023-10-24 18:45:00",
+                duration: 195, // 分钟
+                durationText: "3小时15分钟",
+                photos: 8,
+                locationStatus: "偏差",
+                status: "completed",
+                balance: "¥450.00",
+                socialCategory: "VIP客户",
+                abnormal: true,
+                locationAbnormal: true,
+                abnormalReason: "服务时长过长，照片数量异常",
+                locationAbnormalReason: "定位偏差5.6公里"
+            }
+        ];
+
+        // 树形结构数据
+        const treeData = {
+            grid: {
+                title: "选择地址",
+                items: [
+                    {
+                        id: "grid1",
+                        name: "网格一（南开区）",
+                        children: [
+                            { id: "grid1-1", name: "南开区北部" },
+                            { id: "grid1-2", name: "南开区中部" },
+                            { id: "grid1-3", name: "南开区南部" }
+                        ]
+                    },
+                    {
+                        id: "grid2",
+                        name: "网格二（河西区）",
+                        children: [
+                            { id: "grid2-1", name: "河西区东部" },
+                            { id: "grid2-2", name: "河西区西部" }
+                        ]
+                    },
+                    {
+                        id: "grid3",
+                        name: "网格三（和平区）",
+                        children: [
+                            { id: "grid3-1", name: "和平区北部" },
+                            { id: "grid3-2", name: "和平区南部" }
+                        ]
+                    },
+                    {
+                        id: "grid4",
+                        name: "网格四（河东区）",
+                        children: [
+                            { id: "grid4-1", name: "河东区东部" },
+                            { id: "grid4-2", name: "河东区西部" }
+                        ]
+                    },
+                    {
+                        id: "grid5",
+                        name: "网格五（河北区）",
+                        children: [
+                            { id: "grid5-1", name: "河北区北部" },
+                            { id: "grid5-2", name: "河北区南部" }
+                        ]
+                    }
+                ]
+            },
+            department: {
+                title: "选择部门",
+                items: [
+                    {
+                        id: "dept1",
+                        name: "和平河西分公司",
+                        children: [
+                            { id: "dept1-1", name: "网络技术组" },
+                            { id: "dept1-2", name: "软件技术组" },
+                            { id: "dept1-3", name: "硬件技术组" }
+                        ]
+                    },
+                    {
+                        id: "dept2",
+                        name: "滨海分公司",
+                        children: [
+                            { id: "dept2-1", name: "客户咨询组" },
+                            { id: "dept2-2", name: "客户支持组" },
+                            { id: "dept2-3", name: "客户回访组" }
+                        ]
+                    },
+                    {
+                        id: "dept3",
+                        name: "城西分公司",
+                        children: [
+                            { id: "dept3-1", name: "设备维修组" },
+                            { id: "dept3-2", name: "现场维修组" }
+                        ]
+                    },
+                    {
+                        id: "dept4",
+                        name: "宁河分公司",
+                        children: [
+                            { id: "dept4-1", name: "设备安装组" },
+                            { id: "dept4-2", name: "系统安装组" }
+                        ]
+                    }
+                ]
+            },
+            operator: {
+                title: "选择操作员",
+                items: [
+                    {
+                        id: "op1",
+                        name: "张三 (520111xlx)",
+                        children: [
+                            { id: "op1-1", name: "负责区域：南开区" },
+                            { id: "op1-2", name: "擅长：设备安装、维护" }
+                        ]
+                    },
+                    {
+                        id: "op2",
+                        name: "李四 (520112wl)",
+                        children: [
+                            { id: "op2-1", name: "负责区域：河西区" },
+                            { id: "op2-2", name: "擅长：故障维修" }
+                        ]
+                    },
+                    {
+                        id: "op3",
+                        name: "王五 (520113zm)",
+                        children: [
+                            { id: "op3-1", name: "负责区域：和平区" },
+                            { id: "op3-2", name: "擅长：使用培训、咨询" }
+                        ]
+                    },
+                    {
+                        id: "op4",
+                        name: "赵六 (520114lp)",
+                        children: [
+                            { id: "op4-1", name: "负责区域：河东区、河北区" },
+                            { id: "op4-2", name: "擅长：设备安装、定期检查" }
+                        ]
+                    }
+                ]
+            }
+        };
+
+        // 全局变量
+        let currentAbnormalFilter = 'all';
+        let currentTreeType = '';
+        let selectedTreeItem = null;
+
+        // 页面加载时显示所有记录
+        document.addEventListener('DOMContentLoaded', function() {
+            displayRecords(mockRecords);
+        });
+
+        // 显示树形选择模态框
+        function showTreeModal(type) {
+            currentTreeType = type;
+            selectedTreeItem = null;
+            
+            // 设置模态框标题
+            document.getElementById('treeModalTitle').textContent = treeData[type].title;
+            
+            // 清空搜索框
+            document.getElementById('treeSearch').value = '';
+            
+            // 生成树形结构
+            generateTree(treeData[type].items);
+            
+            // 显示模态框
+            document.getElementById('treeModal').style.display = 'flex';
+        }
+
+        // 生成树形结构
+        function generateTree(items, parentElement = null) {
+            const treeList = parentElement || document.getElementById('treeList');
+            treeList.innerHTML = '';
+            
+            items.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'tree-item';
+                li.dataset.id = item.id;
+                li.dataset.name = item.name;
+                
+                let html = '';
+                if (item.children && item.children.length > 0) {
+                    html = `
+                        <div>
+                            <span class="toggle" onclick="toggleTreeItem(this)">+</span>
+                            <span class="icon">📁</span>
+                            <span class="name">${item.name}</span>
+                        </div>
+                        <ul style="display: none;">
+                    `;
+                    
+                    // 递归生成子节点
+                    const childUl = document.createElement('ul');
+                    childUl.style.display = 'none';
+                    li.appendChild(childUl);
+                    
+                    // 添加点击事件
+                    li.onclick = function(e) {
+                        if (e.target.classList.contains('toggle')) return;
+                        selectTreeItem(this);
+                    };
+                    
+                    // 先添加基础HTML
+                    li.innerHTML = html;
+                    
+                    // 递归处理子节点
+                    generateTree(item.children, childUl);
+                } else {
+                    html = `
+                        <div>
+                            <span class="toggle"></span>
+                            <span class="icon">📄</span>
+                            <span class="name">${item.name}</span>
+                        </div>
+                    `;
+                    li.innerHTML = html;
+                    
+                    // 添加点击事件
+                    li.onclick = function() {
+                        selectTreeItem(this);
+                    };
+                }
+                
+                treeList.appendChild(li);
+            });
+        }
+
+        // 切换树形节点展开/折叠
+        function toggleTreeItem(toggleElement) {
+            const parentLi = toggleElement.closest('li');
+            const childUl = parentLi.querySelector('ul');
+            
+            if (childUl) {
+                if (childUl.style.display === 'none') {
+                    childUl.style.display = 'block';
+                    toggleElement.textContent = '-';
+                } else {
+                    childUl.style.display = 'none';
+                    toggleElement.textContent = '+';
+                }
+            }
+        }
+
+        // 选择树形节点
+        function selectTreeItem(itemElement) {
+            // 移除之前的选择
+            document.querySelectorAll('.tree-item.selected').forEach(el => {
+                el.classList.remove('selected');
+            });
+            
+            // 添加当前选择
+            itemElement.classList.add('selected');
+            selectedTreeItem = {
+                id: itemElement.dataset.id,
+                name: itemElement.dataset.name
+            };
+        }
+
+        // 过滤树形节点
+        function filterTree() {
+            const searchText = document.getElementById('treeSearch').value.toLowerCase();
+            const treeItems = document.querySelectorAll('.tree-item');
+            
+            treeItems.forEach(item => {
+                const name = item.dataset.name.toLowerCase();
+                if (name.includes(searchText)) {
+                    item.style.display = '';
+                    
+                    // 展开父节点
+                    let parent = item.parentElement;
+                    while (parent && parent.classList.contains('tree-list')) {
+                        const parentLi = parent.closest('li');
+                        if (parentLi) {
+                            const toggle = parentLi.querySelector('.toggle');
+                            if (toggle && toggle.textContent === '+') {
+                                toggleTreeItem(toggle);
+                            }
+                        }
+                        parent = parent.parentElement;
+                    }
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // 确认树形选择
+        function confirmTreeSelection() {
+            if (selectedTreeItem) {
+                // 根据当前类型设置对应的输入框
+                if (currentTreeType === 'grid') {
+                    document.getElementById('gridArea').value = selectedTreeItem.name;
+                } else if (currentTreeType === 'department') {
+                    document.getElementById('department').value = selectedTreeItem.name;
+                } else if (currentTreeType === 'operator') {
+                    document.getElementById('operator').value = selectedTreeItem.name;
+                }
+                
+                // 关闭模态框
+                closeModal('treeModal');
+            } else {
+                alert('请先选择一个选项');
+            }
+        }
+
+        // 搜索记录
+        function searchRecords() {
+            // 获取查询条件
+            const gridArea = document.getElementById('gridArea').value;
+            const department = document.getElementById('department').value;
+            const operator = document.getElementById('operator').value;
+            const serviceType = document.getElementById('serviceType').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            currentAbnormalFilter = document.getElementById('abnormalFilter').value;
+            
+            // 筛选记录
+            let filteredRecords = mockRecords.filter(record => {
+                // 按网格筛选
+                if (gridArea && record.grid !== gridArea) return false;
+                
+                // 按部门筛选
+                if (department && record.department !== department) return false;
+                
+                // 按操作员筛选
+                if (operator && record.operator !== operator.split(' ')[0]) return false;
+                
+                // 按服务类型筛选
+                if (serviceType && record.serviceType !== getServiceTypeText(serviceType)) return false;
+                
+                // 按时间段筛选
+                const recordDate = record.startTime.split(' ')[0];
+                if (startDate && recordDate < startDate) return false;
+                if (endDate && recordDate > endDate) return false;
+                
+                // 按异常类型筛选
+                if (currentAbnormalFilter === 'duration' && !record.abnormal) return false;
+                if (currentAbnormalFilter === 'location' && !record.locationAbnormal) return false;
+                if (currentAbnormalFilter === 'both' && !(record.abnormal && record.locationAbnormal)) return false;
+                
+                return true;
+            });
+            
+            // 显示筛选结果
+            displayRecords(filteredRecords);
+        }
+
+        // 获取服务类型文本
+        function getServiceTypeText(value) {
+            const typeMap = {
+                'installation': '设备安装',
+                'maintenance': '设备维护',
+                'repair': '故障维修',
+                'inspection': '定期检查',
+                'training': '使用培训',
+                'consultation': '技术咨询'
+            };
+            return typeMap[value] || '';
+        }
+
+        // 获取定位状态标签 - 修改为只有2种状态
+        function getLocationStatusTag(distance) {
+            if (distance === 0) {
+                return `<span class="location-status location-ok">正常</span>`;
+            } else {
+                return `<span class="location-status location-error">偏差</span>`;
+            }
+        }
+
+        // 获取记录行类名
+        function getRecordRowClass(record) {
+            if (record.abnormal && record.locationAbnormal) {
+                return 'both-abnormal';
+            } else if (record.locationAbnormal) {
+                return 'location-abnormal';
+            } else if (record.abnormal) {
+                return 'abnormal';
+            }
+            return '';
+        }
+
+        // 显示记录
+        function displayRecords(records) {
+            const recordsBody = document.getElementById('recordsBody');
+            const noDataMessage = document.getElementById('noDataMessage');
+            const recordsSummary = document.getElementById('recordsSummary');
+            
+            // 计算统计数据
+            const totalRecords = records.length;
+            const abnormalRecords = records.filter(r => r.abnormal).length;
+            const locationAbnormalRecords = records.filter(r => r.locationAbnormal).length;
+            const bothAbnormalRecords = records.filter(r => r.abnormal && r.locationAbnormal).length;
+            const completedRecords = records.filter(r => r.status === 'completed').length;
+            const averageDuration = totalRecords > 0 ? 
+                Math.round(records.reduce((sum, r) => sum + r.duration, 0) / totalRecords) : 0;
+            
+            // 更新统计信息
+            recordsSummary.innerHTML = `
+                <div class="summary-card">
+                    <div class="summary-title">总记录数</div>
+                    <div class="summary-value">${totalRecords}</div>
+                </div>
+                <div class="summary-card warning">
+                    <div class="summary-title">时长异常</div>
+                    <div class="summary-value">${abnormalRecords}</div>
+                </div>
+                <div class="summary-card location">
+                    <div class="summary-title">定位异常</div>
+                    <div class="summary-value">${locationAbnormalRecords}</div>
+                </div>
+                <div class="summary-card danger">
+                    <div class="summary-title">双重异常</div>
+                    <div class="summary-value">${bothAbnormalRecords}</div>
+                </div>
+            `;
+            
+            // 如果没有记录，显示无数据消息
+            if (records.length === 0) {
+                recordsBody.innerHTML = '';
+                noDataMessage.style.display = 'block';
+                return;
+            }
+            
+            // 隐藏无数据消息
+            noDataMessage.style.display = 'none';
+            
+            // 生成记录表格行
+            let rowsHTML = '';
+            records.forEach(record => {
+                let statusBadge = '';
+                if (record.status === 'completed') {
+                    statusBadge = '<span class="status-badge status-completed">已完成</span>';
+                } else if (record.status === 'in-progress') {
+                    statusBadge = '<span class="status-badge status-in-progress">进行中</span>';
+                } else if (record.status === 'cancelled') {
+                    statusBadge = '<span class="status-badge status-cancelled">已取消</span>';
+                }
+                
+                // 判断服务时长类别
+                let durationClass = 'duration-normal';
+                if (record.duration < 30) {
+                    durationClass = 'duration-short';
+                } else if (record.duration > 150) {
+                    durationClass = 'duration-long';
+                }
+                
+                // 异常原点标识 - 使用不同颜色的原点
+                const durationDot = record.abnormal ? 
+                    `<span class="abnormal-dot duration-abnormal-dot" title="时长异常"></span>` : '';
+                
+                const locationDot = record.locationAbnormal ? 
+                    `<span class="abnormal-dot location-abnormal-dot" title="定位异常"></span>` : '';
+                
+                // 获取定位状态标签
+                const locationStatusTag = getLocationStatusTag(record.distance);
+                
+                rowsHTML += `
+                    <tr class="${getRecordRowClass(record)}">
+                        <td>
+                            <div class="record-id-container">
+                                ${durationDot}
+                                ${locationDot}
+                                ${record.id}
+                            </div>
+                        </td>
+                        <td>${record.customerName}</td>
+                        <td>${record.operator} (${record.operatorId})</td>
+                        <td>${record.serviceType}</td>
+                        <td class="duration-cell ${durationClass}">${record.durationText}</td>
+                        <td>${locationStatusTag}</td>
+                        <td>${record.startTime.split(' ')[0]}</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn btn-view" onclick="showDetail('${record.id}')">查看详情</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            recordsBody.innerHTML = rowsHTML;
+        }
+
+        // 显示详情
+        function showDetail(recordId) {
+            const record = mockRecords.find(r => r.id === recordId);
+            if (!record) return;
+            
+            // 判断服务时长类别
+            let durationClass = 'duration-normal';
+            let durationNote = '';
+            if (record.duration < 30) {
+                durationClass = 'duration-short';
+                durationNote = '（服务时长过短）';
+            } else if (record.duration > 150) {
+                durationClass = 'duration-long';
+                durationNote = '（服务时长过长）';
+            }
+            
+            // 异常信息
+            const abnormalInfo = record.abnormal ? 
+                `<div class="detail-item">
+                    <div class="detail-label">时长异常原因</div>
+                    <div class="detail-value" style="color: #ea4335;">${record.abnormalReason}</div>
+                </div>` : '';
+            
+            // 定位异常信息
+            const locationAbnormalInfo = record.locationAbnormal ? 
+                `<div class="detail-item">
+                    <div class="detail-label">定位异常原因</div>
+                    <div class="detail-value" style="color: #9c27b0;">${record.locationAbnormalReason}</div>
+                </div>` : '';
+            
+            // 定位可视化
+            const locationMapHTML = `
+                <div class="detail-section">
+                    <h3>位置信息对比</h3>
+                    <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                        <div style="flex: 1;">
+                            <div class="detail-label">目标位置</div>
+                            <div class="detail-value">${record.targetLocation}</div>
+                            <div class="location-map target">
+                                <div class="location-distance">目标点</div>
+                            </div>
+                        </div>
+                        <div style="flex: 1;">
+                            <div class="detail-label">实际位置</div>
+                            <div class="detail-value">${record.actualLocation}</div>
+                            <div class="location-map actual">
+                                <div class="location-distance">实际点</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">位置偏差</div>
+                        <div class="detail-value ${record.distance > 0 ? 'location-error' : 'location-ok'}" style="font-weight: 600;">
+                            ${record.distance > 0 ? `${record.distance}米 (${(record.distance/1000).toFixed(1)}公里)` : '无偏差'}
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">定位状态</div>
+                        <div class="detail-value">${record.locationStatus}</div>
+                    </div>
+                </div>
+            `;
+            
+            // 生成照片预览HTML
+            let photosHTML = '';
+            if (record.photos > 0) {
+                // 显示所有照片的预览
+                for (let i = 0; i < Math.min(record.photos, 8); i++) {
+                    // 使用模拟的本地图片URL
+                    // 在实际应用中，这里应该使用真实的本地图片路径
+                    const photoUrl = `https://picsum.photos/120/120?random=${recordId}${i}`;
+                    photosHTML += `
+                        <div class="photo-preview-item" onclick="showFullscreenPhoto('${recordId}', ${i})">
+                            <img src="${photoUrl}" alt="现场照片 ${i+1}">
+                            <div class="photo-count">照片 ${i+1}</div>
+                        </div>
+                    `;
+                }
+                
+                // 如果照片超过8张，显示更多提示
+                if (record.photos > 8) {
+                    photosHTML += `
+                        <div class="photo-preview-item" style="display: flex; align-items: center; justify-content: center; background-color: #f0f0f0; cursor: default;">
+                            <div style="text-align: center; color: #666;">
+                                <div style="font-size: 24px; margin-bottom: 5px;">+${record.photos - 8}</div>
+                                <div style="font-size: 12px;">更多照片</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            } else {
+                photosHTML = '<div style="color: #999; padding: 20px; text-align: center;">暂无现场照片</div>';
+            }
+            
+            // 生成详情HTML
+            const detailHTML = `
+                <div class="detail-section">
+                    <h3>基本信息</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">记录ID</div>
+                            <div class="detail-value">
+                                ${record.id} 
+                                ${record.abnormal ? '<span class="abnormal-tag">时长异常</span>' : ''}
+                                ${record.locationAbnormal ? '<span class="location-abnormal-tag">定位异常</span>' : ''}
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">客户姓名</div>
+                            <div class="detail-value">${record.customerName}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">客户编码</div>
+                            <div class="detail-value">${record.customerCode}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">联系电话</div>
+                            <div class="detail-value">${record.phone}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">联系地址</div>
+                            <div class="detail-value">${record.address}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">所属网格</div>
+                            <div class="detail-value">${record.grid}</div>
+                        </div>
+                        ${abnormalInfo}
+                        ${locationAbnormalInfo}
+                    </div>
+                </div>
+                
+                ${locationMapHTML}
+                
+                <div class="detail-section">
+                    <h3>服务信息</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">操作员</div>
+                            <div class="detail-value">${record.operator} (${record.operatorId})</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">所属部门</div>
+                            <div class="detail-value">${record.department}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">服务类型</div>
+                            <div class="detail-value">${record.serviceType}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">开始时间</div>
+                            <div class="detail-value">${record.startTime}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">结束时间</div>
+                            <div class="detail-value">${record.endTime}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">服务时长</div>
+                            <div class="detail-value ${durationClass}">${record.durationText} ${durationNote}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h3>现场照片 (${record.photos}张)</h3>
+                    <div class="photos-container">
+                        ${photosHTML}
+                    </div>
+                    <p style="margin-top: 10px; color: #666; font-size: 14px;">点击照片可全屏查看</p>
+                </div>
+            `;
+            
+            // 显示模态框
+            document.getElementById('modalBody').innerHTML = detailHTML;
+            document.getElementById('detailModal').style.display = 'flex';
+        }
+
+        // 显示全屏照片
+        function showFullscreenPhoto(recordId, photoIndex) {
+            const record = mockRecords.find(r => r.id === recordId);
+            if (!record) return;
+            
+            // 使用模拟的本地图片URL
+            // 在实际应用中，这里应该使用真实的本地图片路径
+            const photoUrl = `https://picsum.photos/1920/1080?random=${recordId}${photoIndex}`;
+            
+            // 设置全屏照片
+            const photoContainer = document.getElementById('fullscreenPhotoContainer');
+            photoContainer.innerHTML = `
+                <img src="${photoUrl}" alt="现场照片 ${photoIndex+1}" class="fullscreen-photo">
+            `;
+            
+            // 设置照片信息
+            const photoInfo = document.getElementById('photoInfoOverlay');
+            photoInfo.innerHTML = `
+                <div>
+                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 5px;">${record.customerName} - ${record.serviceType}</div>
+                    <div style="font-size: 14px;">记录ID: ${record.id} | 照片 ${photoIndex+1} / ${record.photos} | 拍摄时间: ${record.startTime}</div>
+                </div>
+            `;
+            
+            // 显示全屏照片模态框
+            document.getElementById('fullscreenPhotoModal').style.display = 'flex';
+            
+            // 禁用页面滚动
+            document.body.style.overflow = 'hidden';
+        }
+
+        // 关闭全屏照片
+        function closeFullscreenPhoto() {
+            document.getElementById('fullscreenPhotoModal').style.display = 'none';
+            // 恢复页面滚动
+            document.body.style.overflow = 'auto';
+        }
+
+        // 关闭模态框
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // 重置表单
+        function resetForm() {
+            document.getElementById('gridArea').value = '';
+            document.getElementById('department').value = '';
+            document.getElementById('operator').value = '';
+            document.getElementById('serviceType').value = '';
+            document.getElementById('startDate').value = '2023-10-01';
+            document.getElementById('endDate').value = '2023-10-31';
+            document.getElementById('abnormalFilter').value = 'all';
+            
+            // 显示所有记录
+            displayRecords(mockRecords);
+        }
+
+        // 点击模态框背景关闭
+        document.querySelectorAll('.detail-modal, .fullscreen-photo-modal, .tree-modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    if (this.id === 'fullscreenPhotoModal') {
+                        closeFullscreenPhoto();
+                    } else {
+                        this.style.display = 'none';
+                    }
+                }
+            });
+        });
+
+        // ESC键关闭全屏照片
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('fullscreenPhotoModal').style.display === 'flex') {
+                closeFullscreenPhoto();
+            }
+        });
+    </script>
+</body>
+</html>
