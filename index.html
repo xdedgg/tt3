@@ -210,6 +210,10 @@
             border-left-color: #34a853;
         }
         
+        .summary-card.feedback {
+            border-left-color: #FF9800;
+        }
+        
         .summary-title {
             font-size: 12px;
             color: #666;
@@ -236,6 +240,10 @@
         
         .summary-card.order-none .summary-value {
             color: #34a853;
+        }
+        
+        .summary-card.feedback .summary-value {
+            color: #FF9800;
         }
         
         .records-table {
@@ -333,6 +341,63 @@
         
         .duration-long {
             color: #ea4335;
+        }
+        
+        /* 回访结果样式 */
+        .feedback-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            background-color: white;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        .feedback-select:focus {
+            border-color: #1a73e8;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.1);
+        }
+        
+        .feedback-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        
+        .feedback-very-satisfied {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .feedback-satisfied {
+            background-color: #8BC34A;
+            color: white;
+        }
+        
+        .feedback-general {
+            background-color: #FFC107;
+            color: #333;
+        }
+        
+        .feedback-unsatisfied {
+            background-color: #FF9800;
+            color: white;
+        }
+        
+        .feedback-very-unsatisfied {
+            background-color: #F44336;
+            color: white;
+        }
+        
+        .feedback-pending {
+            background-color: #9E9E9E;
+            color: white;
         }
         
         .action-buttons {
@@ -838,6 +903,106 @@
             position: relative;
         }
         
+        /* 详情页中的回访编辑区域 */
+        .feedback-edit-section {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+            border: 1px solid #eaeaea;
+        }
+        
+        .feedback-edit-title {
+            font-size: 16px;
+            color: #1a73e8;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .feedback-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .feedback-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .feedback-form-label {
+            font-weight: 600;
+            color: #555;
+            font-size: 13px;
+        }
+        
+        .feedback-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 80px;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        .feedback-textarea:focus {
+            border-color: #1a73e8;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.1);
+        }
+        
+        .feedback-form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn-save {
+            background-color: #34A853;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            flex: 1;
+        }
+        
+        .btn-save:hover {
+            background-color: #2E8B46;
+        }
+        
+        .btn-cancel {
+            background-color: #f1f3f4;
+            color: #333;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            flex: 1;
+        }
+        
+        .btn-cancel:hover {
+            background-color: #e3e6e8;
+        }
+        
+        .feedback-cell {
+            min-width: 120px;
+        }
+        
+        /* 表格中的回访状态显示 */
+        .feedback-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
         @media (max-width: 1200px) {
             .main-content {
                 flex-direction: column;
@@ -880,6 +1045,10 @@
             .input-with-button .btn-input {
                 width: 100%;
                 padding: 9px;
+            }
+            
+            .feedback-form-actions {
+                flex-direction: column;
             }
         }
     </style>
@@ -1001,6 +1170,7 @@
                                 <th>服务时长</th>
                                 <th>开始时间</th>
                                 <th>受理单</th>
+                                <th>回访结果</th>
                                 <th>操作</th>
                             </tr>
                         </thead>
@@ -1069,13 +1239,13 @@
 
     <script>
     // 模拟数据 - 整理记录信息，确保每条记录都有完整的地址和部门信息
-    const mockRecords = [
+    let mockRecords = [
         {
             id: "REC001",
             customerName: "李四",
             customerCode: "211000150123",
             phone: "13800138000",
-            address: "南开区华苑街广电小区12号楼3单元501", // 修改为：网格一下级的"南开区华苑街广电小区"
+            address: "南开区华苑街广电小区12号楼3单元501",
             grid: "网格一（南开区）",
             gridFull: "网格一（南开区）",
             operator: "张三",
@@ -1095,6 +1265,9 @@
             locationAbnormal: false,
             abnormalReason: "",
             locationAbnormalReason: "",
+            feedback: "非常满意", // 新增回访结果字段
+            feedbackTime: "2025-10-16 10:30:00", // 新增回访时间
+            feedbackNote: "服务态度很好，安装速度快", // 新增回访备注
             orders: [
                 {
                     name: "安装工单-001",
@@ -1119,7 +1292,7 @@
             customerName: "王明",
             customerCode: "211000150124",
             phone: "13900139000",
-            address: "南开区广电街梅江小区8号楼2单元302", // 修改为：网格一下级的"南开区广电街梅江小区"
+            address: "南开区广电街梅江小区8号楼2单元302",
             grid: "网格一（南开区）",
             gridFull: "网格一（南开区）",
             operator: "李四",
@@ -1139,6 +1312,9 @@
             locationAbnormal: true,
             abnormalReason: "服务时长异常",
             locationAbnormalReason: "定位偏差1.2公里",
+            feedback: "一般", // 新增回访结果字段
+            feedbackTime: "2025-10-17 14:15:00", // 新增回访时间
+            feedbackNote: "维修时间较长，但问题解决了", // 新增回访备注
             orders: [
                 {
                     name: "维修工单-045",
@@ -1163,7 +1339,7 @@
             customerName: "张红",
             customerCode: "211000150125",
             phone: "13600136000",
-            address: "河西区天才街有线小区15楼1503室", // 修改为：网格二下级的"河西区天才街有线小区"
+            address: "河西区天才街有线小区15楼1503室",
             grid: "网格二（河西区）",
             gridFull: "网格二（河西区）",
             operator: "王五",
@@ -1183,6 +1359,9 @@
             locationAbnormal: false,
             abnormalReason: "",
             locationAbnormalReason: "",
+            feedback: "满意", // 新增回访结果字段
+            feedbackTime: "2025-10-18 09:45:00", // 新增回访时间
+            feedbackNote: "调试专业，讲解清晰", // 新增回访备注
             orders: [
                 {
                     name: "培训工单-012",
@@ -1207,7 +1386,7 @@
             customerName: "赵刚",
             customerCode: "211000150126",
             phone: "13700137000",
-            address: "河西区鑫茂街梅江小区5号楼1单元101", // 修改为：网格二下级的"河西区鑫茂街梅江小区"
+            address: "河西区鑫茂街梅江小区5号楼1单元101",
             grid: "网格二（河西区）",
             gridFull: "网格二（河西区）",
             operator: "赵六",
@@ -1227,6 +1406,9 @@
             locationAbnormal: true,
             abnormalReason: "服务时长超过标准",
             locationAbnormalReason: "定位偏差2.8公里",
+            feedback: "待回访", // 改为待回访
+            feedbackTime: "", // 清空回访时间
+            feedbackNote: "", // 清空回访备注
             orders: [
                 {
                     name: "安装工单-078",
@@ -1251,7 +1433,7 @@
             customerName: "刘芳",
             customerCode: "211000150127",
             phone: "13500135000",
-            address: "和平区华苑街广电小区3号楼4单元202", // 修改为：网格三下级的"和平区华苑街广电小区"
+            address: "和平区华苑街广电小区3号楼4单元202",
             grid: "网格三（和平区）",
             gridFull: "网格三（和平区）",
             operator: "张三",
@@ -1271,6 +1453,9 @@
             locationAbnormal: false,
             abnormalReason: "",
             locationAbnormalReason: "",
+            feedback: "待回访", // 改为待回访
+            feedbackTime: "", // 清空回访时间
+            feedbackNote: "", // 清空回访备注
             orders: [
                 {
                     name: "维护工单-033",
@@ -1295,7 +1480,7 @@
             customerName: "陈伟",
             customerCode: "211000150128",
             phone: "13400134000",
-            address: "和平区广电街九连小区10号楼2单元601", // 修改为：网格三下级的"和平区广电街九连小区"
+            address: "和平区广电街九连小区10号楼2单元601",
             grid: "网格三（和平区）",
             gridFull: "网格三（和平区）",
             operator: "李四",
@@ -1315,6 +1500,9 @@
             locationAbnormal: false,
             abnormalReason: "服务未完成",
             locationAbnormalReason: "",
+            feedback: "待回访", // 已为待回访
+            feedbackTime: "", // 未回访
+            feedbackNote: "", // 未回访
             orders: [
                 {
                     name: "检查工单-021",
@@ -1339,7 +1527,7 @@
             customerName: "杨洋",
             customerCode: "211000150129",
             phone: "13300133000",
-            address: "河东区天才街有线小区22楼2208", // 修改为：网格四下级的"河东区天才街有线小区"
+            address: "河东区天才街有线小区22楼2208",
             grid: "网格四（河东区）",
             gridFull: "网格四（河东区）",
             operator: "王五",
@@ -1359,6 +1547,9 @@
             locationAbnormal: true,
             abnormalReason: "",
             locationAbnormalReason: "定位偏差12.5公里，可能未到达现场",
+            feedback: "待回访", // 改为待回访
+            feedbackTime: "", // 清空回访时间
+            feedbackNote: "", // 清空回访备注
             orders: [] // 无受理单
         },
         {
@@ -1366,7 +1557,7 @@
             customerName: "周涛",
             customerCode: "211000150130",
             phone: "13200132000",
-            address: "河东区鑫茂街梅江小区B座903", // 修改为：网格四下级的"河东区鑫茂街梅江小区"
+            address: "河东区鑫茂街梅江小区B座903",
             grid: "网格四（河东区）",
             gridFull: "网格四（河东区）",
             operator: "赵六",
@@ -1386,6 +1577,9 @@
             locationAbnormal: false,
             abnormalReason: "服务时长异常，照片数量异常",
             locationAbnormalReason: "",
+            feedback: "待回访", // 改为待回访
+            feedbackTime: "", // 清空回访时间
+            feedbackNote: "", // 清空回访备注
             orders: [
                 {
                     name: "安装工单-102",
@@ -1410,7 +1604,7 @@
             customerName: "吴华",
             customerCode: "211000150131",
             phone: "13100131000",
-            address: "河北区华苑街广电小区7号楼3单元402", // 修改为：网格五下级的"河北区华苑街广电小区"
+            address: "河北区华苑街广电小区7号楼3单元402",
             grid: "网格五（河北区）",
             gridFull: "网格五（河北区）",
             operator: "张三",
@@ -1430,6 +1624,9 @@
             locationAbnormal: false,
             abnormalReason: "服务时长过短",
             locationAbnormalReason: "",
+            feedback: "待回访", // 改为待回访
+            feedbackTime: "", // 清空回访时间
+            feedbackNote: "", // 清空回访备注
             orders: [
                 {
                     name: "维护工单-056",
@@ -1454,7 +1651,7 @@
             customerName: "郑丽",
             customerCode: "211000150132",
             phone: "13000130000",
-            address: "河北区广电街九连小区12号楼1单元301", // 修改为：网格五下级的"河北区广电街九连小区"
+            address: "河北区广电街九连小区12号楼1单元301",
             grid: "网格五（河北区）",
             gridFull: "网格五（河北区）",
             operator: "李四",
@@ -1474,6 +1671,9 @@
             locationAbnormal: true,
             abnormalReason: "服务时长过长，照片数量异常",
             locationAbnormalReason: "定位偏差5.6公里",
+            feedback: "待回访", // 改为待回访
+            feedbackTime: "", // 清空回访时间
+            feedbackNote: "", // 清空回访备注
             orders: [
                 {
                     name: "维修工单-087",
@@ -1624,6 +1824,7 @@
     let currentTreeType = '';
     let selectedTreeItem = null;
     let selectedOperators = []; // 存储已选择的操作员
+    let currentDetailRecordId = null; // 当前详情页面显示的记录ID
 
     // 网格-小区映射关系
     const gridCommunityMap = {
@@ -1925,6 +2126,19 @@
         return typeMap[value] || '';
     }
 
+    // 获取回访结果的CSS类名
+    function getFeedbackClass(feedbackValue) {
+        const feedbackClassMap = {
+            '非常满意': 'feedback-very-satisfied',
+            '满意': 'feedback-satisfied',
+            '一般': 'feedback-general',
+            '不满意': 'feedback-unsatisfied',
+            '非常不满意': 'feedback-very-unsatisfied',
+            '待回访': 'feedback-pending'
+        };
+        return feedbackClassMap[feedbackValue] || 'feedback-pending';
+    }
+
     // 获取记录行类名
     function getRecordRowClass(record) {
         if (record.abnormal && record.locationAbnormal) {
@@ -1952,8 +2166,16 @@
         const orderNoneRecords = records.filter(r => !r.orders || r.orders.length === 0).length;
         const bothAbnormalRecords = records.filter(r => r.abnormal && r.locationAbnormal).length;
         const completedRecords = records.filter(r => r.status === 'completed').length;
-        const averageDuration = totalRecords > 0 ? 
-            Math.round(records.reduce((sum, r) => sum + r.duration, 0) / totalRecords) : 0;
+        
+        // 计算回访统计数据
+        const feedbackStats = {
+            '非常满意': records.filter(r => r.feedback === '非常满意').length,
+            '满意': records.filter(r => r.feedback === '满意').length,
+            '一般': records.filter(r => r.feedback === '一般').length,
+            '不满意': records.filter(r => r.feedback === '不满意').length,
+            '非常不满意': records.filter(r => r.feedback === '非常不满意').length,
+            '待回访': records.filter(r => r.feedback === '待回访').length
+        };
         
         // 更新统计信息
         recordsSummary.innerHTML = `
@@ -1973,6 +2195,10 @@
                 <div class="summary-title">无受理单</div>
                 <div class="summary-value">${orderNoneRecords}</div>
             </div>
+            <div class="summary-card feedback">
+                <div class="summary-title">已回访</div>
+                <div class="summary-value">${totalRecords - feedbackStats['待回访']}</div>
+            </div>
         `;
         
         if (records.length === 0) {
@@ -1984,7 +2210,7 @@
         noDataMessage.style.display = 'none';
         
         let rowsHTML = '';
-        records.forEach(record => {
+        records.forEach((record, index) => {
             // 设置受理单状态
             let statusBadge = '';
             let hasOrders = record.orders && record.orders.length > 0;
@@ -2014,6 +2240,10 @@
             const orderNoneDot = (!record.orders || record.orders.length === 0) ? 
                 `<span class="abnormal-dot order-none-dot" title="无受理单"></span>` : '';
             
+            // 回访结果徽章显示
+            const feedbackClass = getFeedbackClass(record.feedback);
+            const feedbackBadge = `<span class="feedback-badge ${feedbackClass}">${record.feedback}</span>`;
+            
             rowsHTML += `
                 <tr class="${getRecordRowClass(record)}">
                     <td>
@@ -2032,6 +2262,11 @@
                     <td>${record.startTime.split(' ')[0]}</td>
                     <td>${statusBadge}</td>
                     <td>
+                        <div class="feedback-status">
+                            ${feedbackBadge}
+                        </div>
+                    </td>
+                    <td>
                         <div class="action-buttons">
                             <button class="action-btn btn-view" onclick="showDetail('${record.id}')">查看详情</button>
                         </div>
@@ -2047,6 +2282,8 @@
     function showDetail(recordId) {
         const record = mockRecords.find(r => r.id === recordId);
         if (!record) return;
+        
+        currentDetailRecordId = recordId;
         
         let durationClass = 'duration-normal';
         let durationNote = '';
@@ -2129,12 +2366,16 @@
                             <div style="font-size: 24px; margin-bottom: 5px;">+${record.photos - 8}</div>
                             <div style="font-size: 12px;">更多照片</div>
                         </div>
-                    </div>
                 `;
             }
         } else {
             photosHTML = '<div style="color: #999; padding: 20px; text-align: center;">暂无现场照片</div>';
         }
+        
+        // 回访信息HTML
+        const feedbackClass = getFeedbackClass(record.feedback);
+        const feedbackTime = record.feedbackTime ? record.feedbackTime : '未回访';
+        const feedbackNote = record.feedbackNote ? record.feedbackNote : '无备注';
         
         // 生成详情HTML
         const detailHTML = `
@@ -2201,7 +2442,10 @@
                         <div class="detail-value ${durationClass}">${record.durationText} ${durationNote}</div>
                     </div>
                     ${record.abnormal ? `
-                  
+                    <div class="detail-item">
+                        <div class="detail-label">时长异常原因</div>
+                        <div class="detail-value" style="color: #fbbc04;">${record.abnormalReason}</div>
+                    </div>
                     ` : ''}
                     ${record.locationAbnormal ? `
                     <div class="detail-item">
@@ -2219,6 +2463,28 @@
             </div>
             
             <div class="detail-section">
+                <h3>回访信息</h3>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">回访结果</div>
+                        <div class="detail-value">
+                            <span class="feedback-badge ${feedbackClass}">${record.feedback}</span>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">回访时间</div>
+                        <div class="detail-value">${feedbackTime}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">回访备注</div>
+                        <div class="detail-value">${feedbackNote}</div>
+                    </div>
+                </div>
+            </div>
+            
+       
+            
+            <div class="detail-section">
                 <h3>受理单信息 (${record.orders ? record.orders.length : 0}条)</h3>
                 ${ordersHTML}
             </div>
@@ -2230,10 +2496,84 @@
                 </div>
                 <p style="margin-top: 10px; color: #666; font-size: 14px;">点击照片可全屏查看</p>
             </div>
+
+
+
+     <!-- 回访编辑区域 -->
+            <div class="feedback-edit-section">
+                <div class="feedback-edit-title">编辑回访信息</div>
+                <div class="feedback-form" id="feedbackForm">
+                    <div class="feedback-form-group">
+                        <label class="feedback-form-label">满意度</label>
+                        <select class="feedback-select" id="feedbackSelect">
+                            <option value="非常满意" ${record.feedback === '非常满意' ? 'selected' : ''}>非常满意</option>
+                            <option value="满意" ${record.feedback === '满意' ? 'selected' : ''}>满意</option>
+                            <option value="一般" ${record.feedback === '一般' ? 'selected' : ''}>一般</option>
+                            <option value="不满意" ${record.feedback === '不满意' ? 'selected' : ''}>不满意</option>
+                            <option value="非常不满意" ${record.feedback === '非常不满意' ? 'selected' : ''}>非常不满意</option>
+                            <option value="待回访" ${record.feedback === '待回访' ? 'selected' : ''}>待回访</option>
+                        </select>
+                    </div>
+                    <div class="feedback-form-group">
+                        <label class="feedback-form-label">回访备注</label>
+                        <textarea class="feedback-textarea" id="feedbackNote" placeholder="请输入回访备注信息...">${record.feedbackNote || ''}</textarea>
+                    </div>
+                    <div class="feedback-form-actions">
+                        <button type="button" class="btn-save" onclick="saveFeedback()">保存回访信息</button>
+                        <button type="button" class="btn-cancel" onclick="closeModal('detailModal')">关闭</button>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+
+
+
         `;
         
         document.getElementById('modalBody').innerHTML = detailHTML;
         document.getElementById('detailModal').style.display = 'flex';
+    }
+
+    // 保存回访信息
+    function saveFeedback() {
+        if (!currentDetailRecordId) return;
+        
+        const recordIndex = mockRecords.findIndex(r => r.id === currentDetailRecordId);
+        if (recordIndex === -1) return;
+        
+        const feedbackSelect = document.getElementById('feedbackSelect');
+        const feedbackNote = document.getElementById('feedbackNote');
+        
+        const feedbackValue = feedbackSelect.value;
+        const noteValue = feedbackNote.value;
+        
+        // 获取当前时间
+        const now = new Date();
+        const formattedTime = now.toLocaleString('zh-CN');
+        
+        // 更新记录
+        mockRecords[recordIndex].feedback = feedbackValue;
+        mockRecords[recordIndex].feedbackNote = noteValue;
+        mockRecords[recordIndex].feedbackTime = formattedTime;
+        
+        // 如果选择"待回访"，清空时间
+        if (feedbackValue === '待回访') {
+            mockRecords[recordIndex].feedbackTime = '';
+        }
+        
+        // 显示保存成功消息
+        alert('回访信息保存成功！');
+        
+        // 刷新表格显示
+        searchRecords();
+        
+        // 关闭模态框
+        closeModal('detailModal');
     }
 
     // 显示全屏照片
@@ -2269,6 +2609,9 @@
     // 关闭模态框
     function closeModal(modalId) {
         document.getElementById(modalId).style.display = 'none';
+        if (modalId === 'detailModal') {
+            currentDetailRecordId = null;
+        }
     }
 
     // 重置表单
